@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ojo que sigue al ratón</title>
+  <style>
+    html,body{
+      height:100%;
+      margin:0;
+      background:#b5fff3;
+      display:grid;
+      place-items:center;
+    }
+    canvas{
+      background:#b5fff3;
+      border-radius:12px;
+      box-shadow:0 6px 30px rgba(154, 154, 154, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c" width="640" height="480"></canvas>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+
+    const eye = {
+      x: canvas.width/2,
+      y: canvas.height/2,
+      r: 100,   // radio del ojo
+    };
+
+    const pointer = { x: eye.x, y: eye.y };
+
+    // Mouse
+    canvas.addEventListener('mousemove',(e)=>{
+      const r = canvas.getBoundingClientRect();
+      pointer.x = e.clientX - r.left;
+      pointer.y = e.clientY - r.top;
+    });
+
+    // Touch
+    canvas.addEventListener('touchmove',(e)=>{
+      e.preventDefault();
+      const r = canvas.getBoundingClientRect();
+      const t = e.touches[0];
+      pointer.x = t.clientX - r.left;
+      pointer.y = t.clientY - r.top;
+    },{passive:false});
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // globo ocular
+      ctx.beginPath();
+      ctx.arc(eye.x, eye.y, eye.r, 0, Math.PI*2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      // dirección pupila
+      const dx = pointer.x - eye.x;
+      const dy = pointer.y - eye.y;
+      const ang = Math.atan2(dy, dx);
+
+      const pupilR = 30;
+      const maxOffset = eye.r - pupilR - 10; // margen dentro del ojo
+      const px = eye.x + Math.cos(ang) * maxOffset * 0.3;
+      const py = eye.y + Math.sin(ang) * maxOffset * 0.3;
+
+      // iris
+      ctx.beginPath();
+      ctx.arc(px, py, pupilR, 0, Math.PI*2);
+      ctx.fillStyle = '#3b82f6';
+      ctx.fill();
+
+      // pupila negra
+      ctx.beginPath();
+      ctx.arc(px, py, pupilR/2, 0, Math.PI*2);
+      ctx.fillStyle = '#0f172a';
+      ctx.fill();
+    }
+
+    function loop(){
+      draw();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>

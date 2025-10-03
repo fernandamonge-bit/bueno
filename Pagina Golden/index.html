@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+ <head>
+   <meta charset="utf-8">
+   <title>Página 2</title>
+   <style>
+    body {
+        background-color:rgb(244, 239, 212);
+        text-align: center;
+    }
+    h1{
+       color: black;
+    }
+    h2 {
+        color:maroon;
+        font-variant: small-caps;
+    }
+    p {
+        color:rgb(186, 186, 186);
+        font-size: 24px;
+    }
+    </style>
+ </head>
+ <body>
+   <h1>Golden Globe Winners 2020</h1>
+   
+  <h2><div class="category">Best Motion Picture - Drama</div></h2>
+  <p><div class="winner" id="bestdrama"></div></p>
+
+  <h2><div class="category">Best Motion Picture - Musical or Comedy</div></h2>
+  <p><div class="winner" id="bestcomedy"></div></p>
+
+  <h2><div class="category">Best performance by an actress in a motion picture - drama</div></h2>
+  <p><div class="winner" id="bestactress"></div></p>
+
+  <h2><div class="category">Best performance by an actor in a motion picture - drama</div></h2>
+  <p><div class="winner" id="bestactor"></div></p>
+
+  <script>
+    // Insertar los ganadores dinámicamente
+    document.getElementById("bestdrama").innerHTML = "1917";
+    document.getElementById("bestcomedy").innerHTML = "Once Upon a Time in Hollywood";
+    document.getElementById("bestactress").innerHTML = "Renée Zellweger";
+    document.getElementById("bestactor").innerHTML = "Joaquin Phoenix";
+  </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactivo con Teclado</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Presiona una tecla para cambiar la imagen</h1>
+  <p id="texto">Presiona 1, 2, 3, 4 o 5</p>
+  <img id="imagen" src="img/inicio.png" alt="Imagen inicial">
+
+  <script>
+    const texto = document.getElementById("texto");
+const imagen = document.getElementById("imagen");
+
+// Detectar teclas
+document.addEventListener("keydown", function(event) {
+  switch (event.key) {
+    case "1":
+      texto.textContent = "🌲 Bosque tranquilo";
+      imagen.src = "proyecto-teclado/img/bosque.jpg";
+      break;
+    case "2":
+      texto.textContent = "🌞 Amanecer en la playa";
+      imagen.src = "proyecto-teclado/img/playa.jpg";
+      break;
+    case "3":
+      texto.textContent = "🏔️ Montañas nevadas";
+      imagen.src = "proyecto-teclado/img/montanas.jpg";
+      break;
+    case "4":
+      texto.textContent = "🌆 Ciudad iluminada";
+      imagen.src = "proyecto-teclado/img/ciudad.jpg";
+      break;
+    case "5":
+      texto.textContent = "🌌 Cielo estrellado";
+      imagen.src = "proyecto-teclado/img/estrellas.jpg";
+      break;
+    default:
+      texto.textContent = "Tecla no programada (usa 1, 2, 3, 4 o 5)";
+      imagen.src = "proyecto-teclado/img/inicio.png";
+  }
+});
+  </script>
+</body>
+</html>
