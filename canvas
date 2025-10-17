@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dibujo con Canvas API - Casita, Honguito, Estrella, Luna, Libre</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #0b1220;
+      --accent: #f59e0b;
+      --text: #e6eef8;
+    }
+    html,body { height:100%; margin:0; font-family:Inter,system-ui,Segoe UI,Arial; background:linear-gradient(180deg,#071029 0%, #081027 100%); color:var(--text); display:flex; align-items:center; justify-content:center; }
+    .container { width:960px; max-width:96%; padding:18px; background:rgba(255,255,255,0.03); border-radius:12px; box-shadow:0 6px 30px rgba(2,6,23,0.6); }
+    header { display:flex; gap:12px; align-items:center; margin-bottom:12px; }
+    header h1 { font-size:18px; margin:0; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; }
+    button {
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      color:var(--text); border:1px solid rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; cursor:pointer;
+      font-size:14px;
+    }
+    button:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    #canvasWrap { display:flex; gap:16px; align-items:flex-start; margin-top:12px; }
+    canvas { background: linear-gradient(180deg, #071a2b 0%, #021226 100%); border-radius:8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); }
+    .sidebar { width:260px; max-width:30%; font-size:13px; line-height:1.35; }
+    .hint { margin-top:10px; color:#bcd6ff; opacity:0.9; }
+    .small { font-size:12px; color:#9fb4d6; }
+    footer { margin-top:14px; font-size:12px; color:#9fb4d6; text-align:right; }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <h1>Dibujos con Canvas API — Casita, Honguito, Estrella, Luna, Libre</h1>
+      <div style="flex:1"></div>
+      <div class="controls" role="toolbar" aria-label="Controles de dibujo">
+        <button id="btnHouse">Casita</button>
+        <button id="btnMush">Honguito</button>
+        <button id="btnStar">Estrella</button>
+        <button id="btnMoon">Luna</button>
+        <button id="btnFree">Libre</button>
+        <button id="btnClear">Limpiar</button>
+        <button id="btnSave">Exportar PNG</button>
+      </div>
+    </header>
+
+    <div id="canvasWrap">
+      <canvas id="myCanvas" width="640" height="480" aria-label="Canvas de dibujo"></canvas>
+
+      <aside class="sidebar" aria-label="Instrucciones">
+        <strong>Instrucciones</strong>
+        <p class="hint">Pulsa cualquiera de los botones para dibujar la figura en el canvas. El botón <em>Libre</em> dibuja una ilustración creativa de ejemplo. Usa <em>Limpiar</em> para borrar y <em>Exportar PNG</em> para guardar la imagen.</p>
+
+        <p class="small"><strong>Notas técnicas:</strong><br>
+        - Todas las figuras están hechas con métodos del Canvas API (path, arc, fill, stroke, bezier/quadratic).<br>
+        - El dibujo se escala y centra automáticamente en el lienzo.<br>
+        - Puedes editar colores y tamaños en las funciones de dibujo dentro del script.</p>
+
+        <p class="small">Subir a Blackboard: sube este archivo (index.html) o toma la imagen exportada y súbela como entrega.</p>
+      </aside>
+    </div>
+
+    <footer>Hecho con ♥ usando Canvas API — ejemplo educativo</footer>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Ajusta pixel ratio para pantallas HiDPI
+  function fixDPI() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.width;
+    const h = canvas.height;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.scale(dpr, dpr);
+  }
+  fixDPI();
+
+  // Limpia el canvas
+  function clearCanvas() {
+    ctx.save();
+    ctx.setTransform(1,0,0,1,0,0); // reset transform antes de limpiar
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.restore();
+  }
+
+  // Centra y escala un sistema de coordenadas para dibujos consistentes.
+  // width/height son la "caja de dibujo" virtual en unidades lógicas.
+  function withCoordSystem(width, height, drawFn) {
+    ctx.save();
+    const pad = 20; // margen en px
+    const availW = canvas.clientWidth - pad*2;
+    const availH = canvas.clientHeight - pad*2;
+    const scale = Math.min(availW / width, availH / height);
+    ctx.translate(canvas.clientWidth/2, canvas.clientHeight/2);
+    ctx.scale(scale, scale);
+    ctx.translate(-width/2, -height/2);
+    drawFn();
+    ctx.restore();
+  }
+
+  // ----- DIBUJOS ---
