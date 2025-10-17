@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dibujos con Canvas API - Figuras HTML5</title>
+
+<!-- Estilos base proporcionados -->
+<style>
+/* --------------------------- */
+/* Estilos HTML5 base del ejemplo */
+/* --------------------------- */
+aside, footer, header, nav, section {
+  display: block;
+}
+
+body {
+  background-color: #bbb;
+  color: #383838;
+}
+
+#canvas {
+  background-color: #fff;
+  border: 1px solid #000;
+}
+
+header {
+  padding-bottom: 10px;
+}
+
+header a {
+  color: #30f;
+  text-decoration: none;
+}
+
+aside {
+  padding-top: 6px;
+}
+
+/* Estilo general tipo “index” */
+#index-body {
+  background-color: #9497FF;
+  font-family: "Vollkorn", serif;
+  color: #000;
+}
+
+#index-body a {
+  text-decoration: none;
+  color: #0C2C9F;
+}
+
+#index-body #description,
+#index-body #exercises {
+  overflow: auto;
+  max-width: 750px;
+  margin: 20px auto;
+  padding-left: 15px;
+  padding-bottom: 15px;
+  background-color: #fff;
+  border-radius: 15px;
+}
+
+#index-body h1 {
+  color: #b30300;
+}
+
+#exercises ol {
+  margin: 0 20px 10px 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#exercises ol li {
+  padding-top: 5px;
+}
+
+button {
+  background-color: #0C2C9F;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+button:hover {
+  background-color: #b30300;
+}
+</style>
+</head>
+
+<body id="index-body">
+
+  <header>
+    <section id="description">
+      <h1>Ejercicio: Dibujo con el API de Canvas</h1>
+      <p>Selecciona una figura para dibujar en el canvas usando los métodos del API de HTML5.</p>
+      <p><strong>Figuras:</strong> Casita, Honguito, Estrella, Luna (dos círculos intersectados) y Libre.</p>
+    </section>
+  </header>
+
+  <section id="exercises">
+    <h2>Figuras</h2>
+    <div style="text-align:center; margin-bottom:10px;">
+      <button id="btnHouse">Casita</button>
+      <button id="btnMush">Honguito</button>
+      <button id="btnStar">Estrella</button>
+      <button id="btnMoon">Luna</button>
+      <button id="btnFree">Libre</button>
+      <button id="btnClear">Limpiar</button>
+    </div>
+
+    <canvas id="canvas" width="500" height="400"></canvas>
+  </section>
+
+  <footer>
+    <p style="text-align:center; color:#000;">Hecho con HTML5 Canvas API — Ejemplo educativo</p>
+  </footer>
+
+<script>
+// ================================
+// Script para dibujar figuras
+// ================================
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function limpiar() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ---------------- CASITA ----------------
+function casita() {
+  limpiar();
+
+  // Cuerpo
+  ctx.fillStyle = "#FFD580";
+  ctx.fillRect(150, 180, 200, 150);
+
+  // Techo
+  ctx.beginPath();
+  ctx.moveTo(140, 180);
+  ctx.lineTo(250, 100);
+  ctx.lineTo(360, 180);
+  ctx.closePath();
+  ctx.fillStyle = "#B22222";
+  ctx.fill();
+
+  // Puerta
+  ctx.fillStyle = "#8B4513";
+  ctx.fillRect(235, 250, 40, 80);
+
+  // Ventanas
+  ctx.fillStyle = "#ADD8E6";
+  ctx.fillRect(170, 200, 40, 40);
+  ctx.fillRect(290, 200, 40, 40);
+}
+
+// ---------------- HONGUITO ----------------
+function honguito() {
+  limpiar();
+
+  // Tallo
+  ctx.fillStyle = "#F5DEB3";
+  ctx.fillRect(230, 220, 40, 100);
+
+  // Sombrero
+  ctx.beginPath();
+  ctx.arc(250, 220, 80, Math.PI, 0);
+  ctx.fillStyle = "#D43F3A";
+  ctx.fill();
+
+  // Manchas
+  ctx.fillStyle = "#FFFFFF";
+  ctx.beginPath(); ctx.arc(220, 170, 15, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(280, 180, 10, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(250, 150, 12, 0, Math.PI * 2); ctx.fill();
+}
+
+// ---------------- ESTRELLA ----------------
+function estrella() {
+  limpiar();
+
+  ctx.fillStyle = "#FFD700";
+  ctx.beginPath();
+  let cx = 250, cy = 200, spikes = 5, outerRadius = 80, innerRadius = 35;
+  let rot = Math.PI / 2 * 3;
+  let step = Math.PI / spikes;
+
+  ctx.moveTo(cx, cy - outerRadius);
+  for (let i = 0; i < spikes; i++) {
+    let x = cx + Math.cos(rot) * outerRadius;
+    let y = cy + Math.sin(rot) * outerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+
+    x = cx + Math.cos(rot) * innerRadius;
+    y = cy + Math.sin(rot) * innerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+  }
+  ctx.lineTo(cx, cy - outerRadius);
+  ctx.closePath();
+  ctx.fill();
+}
+
+// ---------------- LUNA ----------------
+function luna() {
+  limpiar();
+
+  // Círculo principal
+  ctx.beginPath();
+  ctx.arc(250, 200, 80, 0, Math.PI * 2);
+  ctx.fillStyle = "#FFFACD";
+  ctx.fill();
+
+  // Segundo círculo para formar la intersección
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.beginPath();
+  ctx.arc(280, 180, 80, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalCompositeOperation = "source-over";
+}
+
+// ---------------- LIBRE ----------------
+function libre() {
+  limpiar();
+
+  // Paisaje simple: sol, pasto, montaña
+  ctx.fillStyle = "#87CEFA";
+  ctx.fillRect(0, 0, 500, 400); // cielo
+
+  ctx.fillStyle = "#228B22";
+  ctx.fillRect(0, 300, 500, 100); // pasto
+
+  // Montañas
+  ctx.fillStyle = "#8B7765";
+  ctx.beginPath();
+  ctx.moveTo(100, 300);
+  ctx.lineTo(200, 150);
+  ctx.lineTo(300, 300);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(250, 300);
+  ctx.lineTo(400, 130);
+  ctx.lineTo(500, 300);
+  ctx.closePath();
+  ctx.fill();
+
+  // Sol
+  ctx.beginPath();
+  ctx.arc(80, 80, 40, 0, Math.PI * 2);
+  ctx.fillStyle = "#FFD700";
+  ctx.fill();
+}
+
+// ---------------- BOTONES ----------------
+document.getElementById("btnHouse").onclick = casita;
+document.getElementById("btnMush").onclick = honguito;
+document.getElementById("btnStar").onclick = estrella;
+document.getElementById("btnMoon").onclick = luna;
+document.getElementById("btnFree").onclick = libre;
+document.getElementById("btnClear").onclick = limpiar;
+</script>
+
+</body>
+</html>
