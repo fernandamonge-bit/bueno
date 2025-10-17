@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paint sencillo</title>
+<style>
+  body {
+    text-align: center;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+  }
+
+  h1 {
+    color: #333;
+  }
+
+  #canvas {
+    background-color: white;
+    border: 2px solid black;
+    cursor: crosshair;
+  }
+
+  .toolbar {
+    margin-bottom: 10px;
+  }
+
+  button, .color {
+    margin: 5px;
+    padding: 8px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .color {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+  }
+
+  .color.selected {
+    border: 2px solid black;
+  }
+
+  .small { width: 20px; height: 20px; background-color: #555; }
+  .medium { width: 30px; height: 30px; background-color: #555; }
+  .large { width: 40px; height: 40px; background-color: #555; }
+</style>
+</head>
+<body>
+
+<h1> Paint sencillo</h1>
+
+<div class="toolbar">
+  <!-- Colores -->
+  <div>
+    <div class="color" style="background:red;" data-color="red"></div>
+    <div class="color" style="background:blue;" data-color="blue"></div>
+    <div class="color" style="background:green;" data-color="green"></div>
+    <div class="color" style="background:orange;" data-color="orange"></div>
+    <div class="color" style="background:black;" data-color="black"></div>
+  </div>
+
+  <!-- Grosor -->
+  <div>
+    <button class="size" data-size="2">Fino</button>
+    <button class="size" data-size="5">Medio</button>
+    <button class="size" data-size="10">Grueso</button>
+  </div>
+
+  <!-- Borrar -->
+  <button id="clearBtn" style="background:#ff4d4d; color:white;">Borrar todo</button>
+</div>
+
+<!-- Lienzo -->
+<canvas id="canvas" width="800" height="500"></canvas>
+
+<script>
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  let painting = false;
+  let color = "black";
+  let size = 5;
+
+  // Dibujo
+  canvas.addEventListener("mousedown", start);
+  canvas.addEventListener("mouseup", stop);
+  canvas.addEventListener("mousemove", draw);
+
+  function start(e) {
+    painting = true;
+    draw(e);
+  }
+
+  function stop() {
+    painting = false;
+    ctx.beginPath();
+  }
+
+  function draw(e) {
+    if (!painting) return;
+    ctx.lineWidth = size;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = color;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  }
+
+  // Selección de color
+  const colorBtns = document.querySelectorAll(".color");
+  colorBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      color = btn.dataset.color;
+      colorBtns.forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    });
+  });
+
+  // Selección de grosor
+  const sizeBtns = document.querySelectorAll(".size");
+  sizeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      size = btn.dataset.size;
+    });
+  });
+
+  // Borrar todo
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  });
+</script>
+
+</body>
+</html>
