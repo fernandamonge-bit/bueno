@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reloj Tijuana Cartoon</title>
+
+  <style>
+    body {
+      margin: 0;
+      background-color: #ffdd99; /* Amarillo pastel */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    canvas {
+      background-color: #fff3c4; /* Cremita */
+      border: 12px solid #ff9933; /* Naranja */
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(255, 153, 51, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="reloj" width="420" height="420"></canvas>
+
+  <script>
+    const canvas = document.getElementById("reloj");
+    const ctx = canvas.getContext("2d");
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const r = 160;
+
+
+    const S = 80;
+    const VR3 = (2 * Math.PI / 60) * S;     
+    const VR2 = (2 * Math.PI / 3600) * S;   
+    const VR1 = (2 * Math.PI / 43200) * S;  
+
+
+    function horaTijuana() {
+      const ahora = new Date();
+      return new Date(
+        ahora.toLocaleString("en-US", { timeZone: "America/Tijuana" })
+      );
+    }
+
+    const base = horaTijuana();
+    const baseSeg = base.getSeconds();
+    const baseMin = base.getMinutes();
+    const baseHora = base.getHours() % 12;
+    const inicio = performance.now();
+
+    function dibujar() {
+      const t = (performance.now() - inicio) / 1000;
+
+      const angS = (baseSeg / 60) * 2 * Math.PI + VR3 * t;
+      const angM = ((baseMin * 60 + baseSeg) / 3600) * 2 * Math.PI + VR2 * t;
+      const angH = ((baseHora * 3600 + baseMin * 60 + baseSeg) / 43200) * 2 * Math.PI + VR1 * t;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+      ctx.fillStyle = "#ffe4b3"; 
+      ctx.fill();
+      ctx.lineWidth = 12;
+      ctx.strokeStyle = "#ff9933";
+      ctx.stroke();
+
+
+      for (let i = 0; i < 12; i++) {
+        const a = i * (Math.PI / 6);
+        const x = cx + Math.cos(a) * (r - 25);
+        const y = cy + Math.sin(a) * (r - 25);
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, 2 * Math.PI);
+        ctx.fillStyle = "#cc6600";
+        ctx.fill();
+      }
+
+
+      manecilla(angH, r * 0.55, 10, "#ff6600"); // Horas
+      manecilla(angM, r * 0.75, 7, "#ffbb33"); // Minutos
+      manecilla(angS, r * 0.9, 4, "#ffee66"); // Segundos
+
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 10, 0, 2 * Math.PI);
+      ctx.fillStyle = "#cc6600";
+      ctx.fill();
+
+      requestAnimationFrame(dibujar);
+    }
+
+    function manecilla(ang, largo, grosor, color) {
+      ctx.beginPath();
+      ctx.lineWidth = grosor;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = color;
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(
+        cx + Math.cos(ang - Math.PI / 2) * largo,
+        cy + Math.sin(ang - Math.PI / 2) * largo
+      );
+      ctx.stroke();
+    }
+
+    dibujar();
+  </script>
+</body>
+</html>
