@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cohete - simulación</title>
+<style>
+  html,body { margin:0; height:100%; background:#0b0020; overflow:hidden; }
+  canvas { display:block; width:100vw; height:100vh; }
+</style>
+</head>
+<body>
+<canvas id="space"></canvas>
+<script>
+(() => {
+  const canvas = document.getElementById('space');
+  const ctx = canvas.getContext('2d');
+
+  function resize(){
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.max(window.innerWidth, 300);
+    const h = Math.max(window.innerHeight, 200);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+
+  const STAR_COUNT = 220;
+  let stars = [];
+  function makeStars(){
+    stars = [];
+    for(let i=0;i<STAR_COUNT;i++){
+      stars.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 1.4 + 0.2,
+        a: Math.random() * 0.9 + 0.1,
+        tw: (Math.random()*0.03 + 0.005) * (Math.random()<0.5?1:-1)
+      });
+    }
+  }
+  makeStars();
+
+
+  const ship = {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+    vx: 0,
+    vy: 0
+  };
+
+  const friction = 0.985;
+  let t = 0;
+
+
+  const keys = {};
+  window.addEventListener('keydown', e => { keys[e.key] = true; });
+  window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+  function drawBackground(){
+    const w = window.innerWidth, h = window.innerHeight;
+    const g = ctx.createLinearGradient(0,0,w,h);
+    g.addColorStop(0, '#1a0033');
+    g.addColorStop(1, '#070011');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,w,h);
+
+
+    for(const s of stars){
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.fillStyle = '#fff';
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawShip(){
+    ctx.save();
+    ctx.translate(ship.x, ship.y);
+
+
+    ctx.fillStyle = '#d1e8ff';
+    ctx.beginPath();
+    ctx.moveTo(0, -40);
+    ctx.lineTo(22, 20);
+    ctx.lineTo(-22, 20);
+    ctx.closePath();
+    ctx.fill();
+
+    // ventana circular
+    ctx.fillStyle = '#8fd0ff';
+    ctx.beginPath();
+    ctx.arc(0, -10, 10, 0, Math.PI*2);
+    ctx.fill();
+
+    // aletas
+    ctx.fillStyle = '#b5d6ff';
+    ctx.beginPath();
+    ctx.moveTo(-22, 20);
+    ctx.lineTo(-35, 40);
+    ctx.lineTo(-10, 25);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(22, 20);
+    ctx.lineTo(35, 40);
+    ctx.lineTo(10, 25);
+    ctx.closePath();
+    ctx.fill();
+
+
+    const flame = 6 + 5 * Math.sin(t * 15);
+    ctx.fillStyle = '#ff9f43';
+    ctx.beginPath();
+    ctx.moveTo(-10, 20);
+    ctx.lineTo(0, 40 + flame);
+    ctx.lineTo(10, 20);
+    ctx.closePath();
+    ctx.fill();
+
+
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath();
+    ctx.arc(-4, -14, 3, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function update(dt){
+    t += dt * 0.001;
+
+    const thrust = 0.18;
+    if(keys.ArrowUp || keys.w) ship.vy -= thrust;
+    if(keys.ArrowDown || keys.s) ship.vy += thrust;
+    if(keys.ArrowLeft || keys.a) ship.vx -= thrust;
+    if(keys.ArrowRight || keys.d) ship.vx += thrust;
+
+
+    ship.vx += 0.015 * Math.cos(t * 0.8);
+    ship.vy += 0.015 * Math.sin(t * 0.9);
+
+
+    ship.vx *= friction;
+    ship.vy *= friction;
+
+    ship.x += ship.vx;
+    ship.y += ship.vy;
+
+
+    const margin = 20;
+    const w = window.innerWidth, h = window.innerHeight;
+    if(ship.x < margin){ ship.x = margin; ship.vx = -ship.vx * 0.3; }
+    if(ship.x > w - margin){ ship.x = w - margin; ship.vx = -ship.vx * 0.3; }
+    if(ship.y < margin){ ship.y = margin; ship.vy = -ship.vy * 0.3; }
+    if(ship.y > h - margin){ ship.y = h - margin; ship.vy = -ship.vy * 0.3; }
+  }
+
+  let last = performance.now();
+  function loop(now){
+    const dt = now - last; last = now;
+
+    drawBackground();
+    update(dt);
+    drawShip();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+
+  let ro = window.innerWidth;
+  setInterval(()=>{
+    if(Math.abs(window.innerWidth - ro) > 100){ ro = window.innerWidth; makeStars(); }
+  }, 1000);
+
+})();
+</script>
+</body>
+</html>
